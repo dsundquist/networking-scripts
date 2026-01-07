@@ -13,16 +13,27 @@ step_size=10   # Step size to decrease the packet size
 timeout=1      # Timeout for each ping (in seconds)
 interface_mtu=0
 
+# Detect if the destination is IPv6 (contains ':')
+if [[ "$destination" == *:* ]]; then
+    ping_cmd="ping6"
+    df_flag="-M do"  # For ping6, -M do sets "do not fragment"
+    header_size=40   # IPv6 header is 40 bytes
+else
+    ping_cmd="ping"
+    df_flag="-D"     # For ping, -D sets "do not fragment"
+    header_size=28   # IPv4 header is 28 bytes
+fi
+
 # Start from the max_size and work down
 for ((size=max_size; size>=min_size; size-=step_size)); do
     echo "Pinging $destination with packet size $size..."
-    
-    # Ping the destination with a timeout (-W), "Do Not Fragment" bit (-D), and 1 packet (-c 1)
-    ping -D -c 1 -s $size -W $timeout $destination > /dev/null 2>&1
+
+    # Ping the destination with appropriate flags
+    $ping_cmd $df_flag -c 1 -s $size -W $timeout $destination > /dev/null 2>&1
 
     # Check if the ping was successful
     if [ $? -eq 0 ]; then
-        interface_mtu=$((size + 28))  # Add 28 bytes for the IP/ICMP header
+        interface_mtu=$((size + header_size))  # Add header size for IP/ICMP header
         echo "Success: Path MTU found to be $interface_mtu bytes"
         break
     else
