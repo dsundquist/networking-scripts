@@ -66,8 +66,8 @@ set loop_count=1
         call :get_time
         call :log "[!UTCTIME!] No response from %TARGET%"
         call :log "Running traceroute..."
-        tracert %TARGET% | tee -a %LOGFILE% 2>&1
-        echo. & echo. >> %LOGFILE%
+        for /f "tokens=*" %%i in ('tracert %TARGET% 2^>^&1') do call :log "%%i"
+        call :log ""
         goto loop
     )
     
@@ -84,8 +84,8 @@ set loop_count=1
             call :get_time
             call :log "[!UTCTIME!] High latency detected: !latency!ms (threshold: %THRESHOLD%ms)"
             call :log "Running traceroute..."
-            tracert -d %TARGET% | tee -a %LOGFILE% 2>&1
-            echo. & echo. >> %LOGFILE%
+            for /f "tokens=*" %%i in ('tracert -d %TARGET% 2^>^&1') do call :log "%%i"
+            call :log ""
         ) else (
             call :get_time
             call :log "[!UTCTIME!] %TARGET% - !latency!ms"
