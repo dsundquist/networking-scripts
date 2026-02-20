@@ -5,7 +5,7 @@
 setlocal enabledelayedexpansion
 
 :: Set the target IP or hostname here
-set TARGET=162.159.193.1
+set TARGET=162.159.197.2
 
 :: Initial MTU size to start from
 set MIN_MTU=1100
