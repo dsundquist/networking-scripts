@@ -31,6 +31,8 @@ set INCREMENT=5
 :: Variable to store the largest successful MTU
 set SUCCESSFUL_MTU=0
 
+:: Print run timestamp
+for /f "tokens=*" %%Z in ('tzutil /g') do echo %DATE%  %TIME:~0,8%  ^(%%Z^)
 echo Testing path MTU to !TARGET! [!PROTO!]...
 
 :: Loop through MTU values
